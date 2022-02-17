@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bot", "bot\bot.csproj", "{74DAC439-171B-4E24-A49C-1C3F72306428}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dashboard", "dashboard\dashboard.csproj", "{71D47C91-4615-47EA-8C9D-7881D7E3AC5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shared", "shared\shared.csproj", "{7A903430-2F97-401F-8B39-145FC2FFF604}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{74DAC439-171B-4E24-A49C-1C3F72306428}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74DAC439-171B-4E24-A49C-1C3F72306428}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74DAC439-171B-4E24-A49C-1C3F72306428}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74DAC439-171B-4E24-A49C-1C3F72306428}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71D47C91-4615-47EA-8C9D-7881D7E3AC5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71D47C91-4615-47EA-8C9D-7881D7E3AC5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71D47C91-4615-47EA-8C9D-7881D7E3AC5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71D47C91-4615-47EA-8C9D-7881D7E3AC5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A903430-2F97-401F-8B39-145FC2FFF604}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A903430-2F97-401F-8B39-145FC2FFF604}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A903430-2F97-401F-8B39-145FC2FFF604}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A903430-2F97-401F-8B39-145FC2FFF604}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
