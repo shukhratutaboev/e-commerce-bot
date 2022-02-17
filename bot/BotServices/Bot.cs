@@ -1,7 +1,7 @@
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 
-namespace bot.Services;
+namespace bot.BotServices;
 public class Bot : BackgroundService
 {
     private readonly TelegramBotClient _client;
