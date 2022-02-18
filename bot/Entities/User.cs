@@ -18,12 +18,12 @@ public class User
     public User(long chatId, string username)
     {
         ChatId = chatId;
-        Username = username == "Empty" ? "Empty" : $"@{username}";
+        Username = username is null ? "Empty" : $"@{username}";
         Fullname = string.Empty;
         PhoneNumber = string.Empty;
         Longitude = 0;
         Latitude = 0;
         Address = string.Empty;
-        Process = Process.None;
+        Process = Process.EnteringFullName;
     }
 }

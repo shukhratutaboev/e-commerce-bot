@@ -3,6 +3,30 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace bot.BotServices.TelegramButtons;
 public class Buttons
 {
+    public static IReplyMarkup SendLocation()
+        => new ReplyKeyboardMarkup(new List<List<KeyboardButton>>()
+        {
+            new List<KeyboardButton>()
+            {
+                new KeyboardButton("Send location"){ RequestLocation = true}
+            }
+        })
+        {
+            ResizeKeyboard =true,
+            OneTimeKeyboard = true
+        };
+    public static IReplyMarkup SendContact()
+        => new ReplyKeyboardMarkup(new List<List<KeyboardButton>>()
+        {
+            new List<KeyboardButton>()
+            {
+                new KeyboardButton("Send contact"){ RequestContact = true}
+            }
+        })
+        {
+            ResizeKeyboard =true,
+            OneTimeKeyboard = true
+        };
     public static IReplyMarkup Menu()
         => new ReplyKeyboardMarkup(new List<List<KeyboardButton>>()
         {
