@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+using System.Diagnostics;
 using bot.BotServices.TelegramButtons;
 using bot.Services;
 using Telegram.Bot;
@@ -53,7 +55,7 @@ namespace bot.BotServices
                 await client.EditMessageTextAsync(
                     callbackQuery.Message.Chat.Id,
                     callbackQuery.Message.MessageId,
-                    $"{int.Parse(callbackQuery.Message.Text) + 10}",
+                    $"{int.Parse(callbackQuery.Message.Text) + 1}",
                     replyMarkup: InlineButtons.CartItem()
                 );
             }
@@ -62,7 +64,7 @@ namespace bot.BotServices
                 await client.EditMessageTextAsync(
                     callbackQuery.Message.Chat.Id,
                     callbackQuery.Message.MessageId,
-                    $"{int.Parse(callbackQuery.Message.Text) - 5}",
+                    $"{int.Parse(callbackQuery.Message.Text) - 1}",
                     replyMarkup: InlineButtons.CartItem()
                 );
             }
@@ -76,38 +78,71 @@ namespace bot.BotServices
 
         private async Task BotOnMessageRecieved(ITelegramBotClient client, Message? message)
         {
-            if(message.Text == "/start")
+            if(message.Text == "/start" && !_storage.ExistsAsync(message.Chat.Id).Result)
             {
-                await _storage.InsertUserAsync(new Entities.User(message.Chat.Id, message.From.Username??"Empty"));
+                await _storage.InsertUserAsync(new Entities.User(message.Chat.Id, message.From.Username));
                 await client.SendTextMessageAsync(
                     message.Chat.Id,
-                    "Welcome)",
-                    replyMarkup: Buttons.Menu()
+                    "<b>Welcome.</b>\n\nPlease enter your fullname:",
+                    parseMode: ParseMode.Html
                 );
             }
-            if(message.Text == "Book")
+            else
             {
-                await client.SendTextMessageAsync(
-                    message.Chat.Id,
-                    "Categories",
-                    replyMarkup: Buttons.Categories(new List<string>(){"Pizzas", "Lavashes", "Drinks", "HotDogs", "Sets"})
-                );
-            }
-            if(message.Text == "Drinks")
-            {
-                await client.SendTextMessageAsync(
-                    message.Chat.Id,
-                    MessageBuilders.ItemsMessage(new List<string>(){"CocaCola", "Pepsi", "Fanta", "Bliss", "Lemon-Tea", "Coffee"}),
-                    replyMarkup: InlineButtons.Items(new List<string>(){"CocaCola", "Pepsi", "Fanta", "Bliss", "Lemon-Tea", "Coffee"})
-                );
-            }
-            if(message.Text == "Cart")
-            {
-                await client.SendTextMessageAsync(
-                    message.Chat.Id,
-                    "1",
-                    replyMarkup: InlineButtons.CartItem()
-                );
+                var user = (await _storage.GetUserAsync(message.Chat.Id)).user;
+                if(user.Process != Entities.Process.None)
+                {
+                    if(user.Process == Entities.Process.EnteringFullName)
+                    {
+                        user.Fullname = message.Text;
+                        user.Process = Entities.Process.SendingContact;
+                        await _storage.UpdateUserAsync(user);
+                        await client.SendTextMessageAsync(
+                            user.ChatId,
+                            "Please send me your contact or own phone number (ex: +998912345678):\n",
+                            replyMarkup: Buttons.SendContact()
+                        );
+                    }
+                    else if(user.Process == Entities.Process.SendingContact)
+                    {
+                        if(message.Contact is null)
+                        {
+                            if(Regex.Match(message.Text, @"(?:[+][9]{2}[8][0-9]{2}[0-9]{3}[0-9]{2}[0-9]{2})").Success)
+                            {
+                                user.PhoneNumber = message.Text;
+                            }
+                            else
+                            {
+                                await client.SendTextMessageAsync(
+                                    user.ChatId,
+                                    "Message must be contact or phone number (ex: +998912345678)!"
+                                );
+                                _logger.LogInformation($"Number doesn't match: {user.ChatId} {user.Username}");
+                                return;
+                            }
+                        }
+                        else user.PhoneNumber = "+"+message.Contact.PhoneNumber;
+                        user.Process = Entities.Process.SendingLocation;
+                        await _storage.UpdateUserAsync(user);
+                        await client.SendTextMessageAsync(
+                            user.ChatId,
+                            "Menu",
+                            replyMarkup: Buttons.Menu()
+                        );
+                    }
+                }
+                // else if(user.Process == Entities.Process.SendingLocation)
+                // {
+
+                //     user.Latitude = message.Location.Latitude;
+                //     user.Longitude = message.Location.Longitude;
+                //     user.Process = Entities.Process.None;
+                //     await _storage.UpdateUserAsync(user);
+                //     await client.SendTextMessageAsync(
+                //         user.ChatId,
+                //         "Now you can use this bot."
+                //     );
+                // }
             }
         }
     }
