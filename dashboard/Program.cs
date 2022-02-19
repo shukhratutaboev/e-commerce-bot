@@ -1,6 +1,13 @@
+using dashboard.Entities;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<DashboardDbContext>(options => 
+{
+    options.UseSqlite(builder.Configuration.GetConnectionString("DbConnection"));
+}, ServiceLifetime.Singleton);
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
