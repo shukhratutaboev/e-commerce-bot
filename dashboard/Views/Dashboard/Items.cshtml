@@ -1,0 +1,73 @@
+
+@model IEnumerable<Item>
+@{
+    ViewData["Title"] = "Items";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Item List</h2>
+		</div>
+        <div class="col-6 text-end">
+            <a asp-controller="Dashboard" asp-action="ItemCreate" class="btn btn-primary">
+               <i class="bi bi-plus-circle"></i> &nbsp; Create New item
+			</a>
+		</div>
+	</div>
+    <br /><br />
+
+<table class="table table-bordered table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>
+                Item Name
+			</th>
+            <th>
+                Item Id
+			</th>
+            <th>
+                Cost
+			</th>
+            <th>
+                Category
+			</th>
+            <th>
+                Image
+			</th>
+            <th></th>
+		</tr>
+	</thead>
+    <tbody>
+        @foreach(var obj in Model)
+        {
+            <tr>
+                <td width="20%">
+                    @obj.Name
+				</td>
+                <td width="30%">
+                    @obj.ItemId
+				</td>
+                <td width="10%">
+                    @obj.Cost
+				</td>
+                <td width="20%">
+                    @obj.Category.Name
+				</td>
+                <td width="20%">
+                    <img src="@obj.ImageUrl" alt="@obj.ItemId" height="50">
+				</td>
+                <td>
+                    <div class="w-75 btn-group" role="group">
+                        <a asp-controller="Dashboard" asp-action="ItemEdit" asp-route-id="@obj.ItemId"
+                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Edit</a>
+                        <a asp-controller="Category" asp-action="Delete" asp-route-id="@obj.ItemId"
+                        class="btn btn-danger mx-2"> <i class="bi bi-trash-fill"></i> Delete</a>
+					</div>
+				</td>
+			</tr>
+        }
+    </tbody>
+
+</table>
+</div>

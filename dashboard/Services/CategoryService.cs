@@ -50,11 +50,25 @@ public class CategoryService : IService<Category>
     }
 
     public async Task<bool> ExistsAsync(Guid id)
-        => await _ctx.Categories.AnyAsync(c => c.Id == id);
+        => await _ctx.Categories.AnyAsync(c => c.CategoryId == id);
 
     public async Task<List<Category>> GetAllAsync()
         => await _ctx.Categories.ToListAsync();
 
     public async Task<Category> GetAsync(Guid id)
-        => await _ctx.Categories.FirstOrDefaultAsync(c => c.Id == id);
+        => await _ctx.Categories.FirstOrDefaultAsync(c => c.CategoryId == id);
+    public async Task<(bool IsSuccess, Exception Exception)> UpdateAsync(Category updatedObject)
+    {
+        try
+        {
+            _ctx.Categories.Update(updatedObject);
+            await _ctx.SaveChangesAsync();
+
+            return (true, null);
+        }
+        catch(Exception e)
+        {
+            return (false, e);
+        }
+    }
 }

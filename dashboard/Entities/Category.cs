@@ -6,20 +6,20 @@ namespace dashboard.Entities;
 public class Category
 {
     [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public Guid Id { get; set; }
+    public Guid CategoryId { get; set; }
     
     [Required]
     [MaxLength(20)]
     public string Name { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public ICollection<Item> Items { get; set; }
+    public virtual ICollection<Item> Items { get; set; }
 
     [Obsolete("Only for entity binding.")]
     public Category(){}
     public Category(string name, ICollection<Item> items = default)
     {
-        Id = Guid.NewGuid();
+        CategoryId = Guid.NewGuid();
         Name = name;
     }
 }
