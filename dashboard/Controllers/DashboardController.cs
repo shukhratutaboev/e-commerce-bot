@@ -47,6 +47,35 @@ public class DashboardController : Controller
         }
         return View(obj);
     }
+    public async Task<IActionResult> CategoryEdit(Guid id)
+    {
+        var category = await _cts.GetAsync(id);
+        return View(category.ToModel());
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CategoryEdit(NewCategory obj, Guid id)
+    {
+        if(ModelState.IsValid)
+        {
+            var category = await _cts.GetAsync(id);
+            category.Name = obj.Name;
+            return RedirectToAction("Categories");
+        }
+        return View(obj);
+    }
+    public async Task<IActionResult> CategoryDelete(Guid id)
+    {
+        var category = await _cts.GetAsync(id);
+        return View(category.ToModel());
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CategoryDelete(NewCategory obj, Guid id)
+    {
+        var category = await _cts.DeleteAsync(id);
+        return RedirectToAction("Categories");
+    }
     public async Task<IActionResult> Items()
     {
         var itemList = await _its.GetAllAsync();
@@ -94,5 +123,19 @@ public class DashboardController : Controller
             return RedirectToAction("Items");
         }
         return View(obj);
+    }
+    public async Task<IActionResult> ItemDelete(Guid id)
+    {
+        var item = await _its.GetAsync(id);
+        if(id == null && item == default) return NotFound();
+        return View(item.ToModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ItemDelete(NewItem obj, Guid id)
+    {
+        await _its.DeleteAsync(id);
+        return RedirectToAction("Items");
     }
 }

@@ -11,6 +11,10 @@ public static class ModelEntityMappers
             ImageUrl = default,
             CategoryId = item.CategoryId
         };
+    public static NewCategory ToModel(this Category category)
+        => new NewCategory(){
+            Name = category.Name
+        };
     public static Category ToEntity(this NewCategory category)
         => new Category(category.Name);
     public static Item ToEntity(this NewItem item, Category category)

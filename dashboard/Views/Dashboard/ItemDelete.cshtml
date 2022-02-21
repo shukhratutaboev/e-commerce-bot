@@ -1,0 +1,36 @@
+@model NewItem
+
+<form method="post" enctype="multipart/form-data" asp-action="DeleteItem">
+	<div class="border p-3 mt-4">
+		<div class="row pb-2">
+			<h2 class="text-primary">Delete Item</h2>
+			<hr />
+		</div>
+		<div class="mb-3">
+			<label asp-for="Name"></label>
+			<input asp-for="Name" disabled class="form-control" />
+		</div>
+        <div class="mb-3">
+			<label asp-for="Cost"></label>
+			<input asp-for="Cost" disabled class="form-control" />
+		</div>
+        <div class="mb-3">
+			<label asp-for="CategoryId"></label>
+			<input asp-for="CategoryId" disabled class="form-control" />
+		</div>
+        <div class="mb-3">
+			<label asp-for="ImageUrl"></label>
+			<input type="file" accept="image/*" disabled asp-for="ImageUrl" class="form-control" />
+		</div>
+		<button type="submit" class="btn btn-danger" style="width:150px">Delete</button>
+		<a asp-controller="Dashboard" asp-action="Items" class="btn btn-secondary" style="width:150px">
+			Back to List
+		</a>
+	</div>
+</form>
+
+@section Scripts{
+	@{
+		<partial name="_ValidationScriptsPartial" />
+	}
+}
