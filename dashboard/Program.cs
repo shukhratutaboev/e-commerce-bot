@@ -1,4 +1,5 @@
 using dashboard.Entities;
+using dashboard.Sevices;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,8 @@ builder.Services.AddDbContext<DashboardDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DbConnection"));
 }, ServiceLifetime.Singleton);
 builder.Services.AddControllersWithViews();
+builder.Services.AddTransient<IService<Category>, CategoryService>();
+builder.Services.AddTransient<IService<Item>, ItemService>();
 
 var app = builder.Build();
 

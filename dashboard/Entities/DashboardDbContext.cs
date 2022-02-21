@@ -15,5 +15,9 @@ public class DashboardDbContext : DbContext
         modelBuilder.Entity<Category>()
             .HasIndex(c => c.Name)
             .IsUnique();
+        modelBuilder.Entity<Item>()
+            .HasIndex(i => i.Name)
+            .IsUnique();
+        modelBuilder.Entity<Category>(c => c.HasMany(c => c.Items).WithOne(i => i.Category).HasForeignKey(i => i.CategoryId));
     }
 }

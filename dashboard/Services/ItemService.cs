@@ -50,11 +50,26 @@ public class ItemService : IService<Item>
     }
 
     public async Task<bool> ExistsAsync(Guid id)
-        => await _ctx.Items.AnyAsync(i => i.Id == id);
+        => await _ctx.Items.AnyAsync(i => i.ItemId == id);
 
     public async Task<List<Item>> GetAllAsync()
         => await _ctx.Items.ToListAsync();
 
     public async Task<Item> GetAsync(Guid id)
-        => await _ctx.Items.FirstOrDefaultAsync(c => c.Id == id);
+        => await _ctx.Items.FirstOrDefaultAsync(c => c.ItemId == id);
+
+    public async Task<(bool IsSuccess, Exception Exception)> UpdateAsync(Item updatedObject)
+    {
+        try
+        {
+            _ctx.Items.Update(updatedObject);
+            await _ctx.SaveChangesAsync();
+
+            return (true, null);
+        }
+        catch(Exception e)
+        {
+            return (false, e);
+        }
+    }
 }
