@@ -6,6 +6,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 
 namespace bot.BotServices
 {
@@ -14,11 +15,13 @@ namespace bot.BotServices
     {
         private readonly ILogger<BotHandlers> _logger;
         private readonly IStorageService _storage;
+        private readonly DashboardClient _client;
 
-        public BotHandlers(ILogger<BotHandlers> logger, IStorageService storage)
+        public BotHandlers(ILogger<BotHandlers> logger, IStorageService storage, DashboardClient client)
         {
             _logger = logger;
             _storage = storage;
+            _client = client;
         }
         public Task HandleErrorAsync(ITelegramBotClient client, Exception exception, CancellationToken ctoken)
         {
@@ -50,22 +53,42 @@ namespace bot.BotServices
 
         private async Task BotOnCallbackQueryRecieved(ITelegramBotClient client, CallbackQuery? callbackQuery)
         {
-            if(callbackQuery.Data == "plus")
+            if(_client.GetItemsByCategoryAsync("all").Result.items.Any(i => i.ItemId == callbackQuery.Data))
             {
-                await client.EditMessageTextAsync(
+                var item = _client.GetItemAsync(callbackQuery.Data).Result.item;
+                byte[] data = System.Convert.FromBase64String(item.ImageUrl.Replace("data:data:image/jpeg;base64,/", "/"));
+                MemoryStream ms = new MemoryStream(data);
+                await client.SendPhotoAsync(
                     callbackQuery.Message.Chat.Id,
-                    callbackQuery.Message.MessageId,
-                    $"{int.Parse(callbackQuery.Message.Text) + 1}",
-                    replyMarkup: InlineButtons.CartItem()
+                    ms,
+                    $"1 x {item.Name} {item.Cost} so'm",
+                    ParseMode.Markdown,
+                    replyMarkup: InlineButtons.CartItem(1, item.ItemId)
                 );
             }
-            if(callbackQuery.Data == "minus")
+            if(callbackQuery.Data.Split(" ").ToArray()[0] == "+")
             {
-                await client.EditMessageTextAsync(
+                var a = int.Parse(callbackQuery.Data.Split(" ").ToArray()[1]) + 1;
+                var id = callbackQuery.Data.Split(" ").ToArray()[2];
+                var item = _client.GetItemAsync(id).Result.item;
+                await client.EditMessageCaptionAsync(
                     callbackQuery.Message.Chat.Id,
                     callbackQuery.Message.MessageId,
-                    $"{int.Parse(callbackQuery.Message.Text) - 1}",
-                    replyMarkup: InlineButtons.CartItem()
+                    $"{a} x {item.Name} {item.Cost * a} so'm",
+                    replyMarkup: InlineButtons.CartItem(a, id)
+                );
+            }
+            if(callbackQuery.Data.Split(" ").ToArray()[0] == "-")
+            {
+                var a = int.Parse(callbackQuery.Data.Split(" ").ToArray()[1]) - 1;
+                a = a < 0 ? 0 : a; 
+                var id = callbackQuery.Data.Split(" ").ToArray()[2];
+                var item = _client.GetItemAsync(id).Result.item;
+                await client.EditMessageCaptionAsync(
+                    callbackQuery.Message.Chat.Id,
+                    callbackQuery.Message.MessageId,
+                    $"{a} x {item.Name} {item.Cost * a} so'm",
+                    replyMarkup: InlineButtons.CartItem(a, id)
                 );
             }
         }
@@ -122,7 +145,7 @@ namespace bot.BotServices
                             }
                         }
                         else user.PhoneNumber = "+"+message.Contact.PhoneNumber;
-                        user.Process = Entities.Process.SendingLocation;
+                        user.Process = Entities.Process.None;
                         await _storage.UpdateUserAsync(user);
                         await client.SendTextMessageAsync(
                             user.ChatId,
@@ -131,6 +154,43 @@ namespace bot.BotServices
                         );
                     }
                 }
+                else
+                {
+                    if(message.Text == "Book")
+                    {
+                        await client.SendTextMessageAsync(
+                            message.Chat.Id,
+                            "Categories",
+                            replyMarkup: Buttons.Categories(_client.GetCategoriesAsync().Result.categories.Select(c => c.Name).ToList())
+                        );
+                    }
+                    if(_client.GetCategoriesAsync().Result.categories.Select(c => c.Name).ToList().Contains(message.Text))
+                    {
+                        var items = _client.GetItemsByCategoryAsync(message.Text).Result.items;
+                        // foreach(var i in items)
+                        // {
+                        //     try
+                        //     {
+                        //         byte[] data = System.Convert.FromBase64String(i.ImageUrl.Replace("data:data:image/jpeg;base64,/", "/"));
+                        //         MemoryStream ms = new MemoryStream(data);
+                        //         await client.SendPhotoAsync(
+                        //             message.Chat.Id,
+                        //             ms,
+                        //             $"0x{i.Name} 0 so'm",
+                        //             ParseMode.Markdown,
+                        //             replyMarkup: InlineButtons.CartItem(1, i.ItemId)
+                        //         );
+                        //     }
+                        //     catch(Exception e){}
+                        // }
+                        await client.SendTextMessageAsync(
+                            message.Chat.Id,
+                            MessageBuilders.ItemsMessage(items),
+                            replyMarkup: InlineButtons.Items(items)
+                        );
+                    }
+                }
+
                 // else if(user.Process == Entities.Process.SendingLocation)
                 // {
 

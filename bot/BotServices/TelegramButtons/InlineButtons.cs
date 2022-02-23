@@ -1,17 +1,19 @@
+using bot.DTO;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace bot.BotServices.TelegramButtons;
 public class InlineButtons
 {
-    public static InlineKeyboardMarkup CartItem()
+    public static InlineKeyboardMarkup CartItem(int a, string id)
         => new InlineKeyboardMarkup(
             new InlineKeyboardButton[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "➖", "minus"),
-                InlineKeyboardButton.WithCallbackData(text: "➕", "plus"),
+                InlineKeyboardButton.WithCallbackData(text: "➖", $"- {a} {id}"),
+                $"{a}",
+                InlineKeyboardButton.WithCallbackData(text: "➕", $"+ {a} {id}"),
             }
         );
-    public static IReplyMarkup Items(List<string> elements)
+    public static IReplyMarkup Items(List<Item> elements)
     {
         var buttons = new List<List<InlineKeyboardButton>>(){};
         var count = elements.Count;
@@ -25,7 +27,7 @@ public class InlineButtons
                 {
                     buttons[i].Add(
                         InlineKeyboardButton.WithCallbackData(text:$"{i * count / 2 + j + 1}",
-                                                    callbackData:elements[i * count / 2 + j])
+                                                    callbackData:elements[i * count / 2 + j].ItemId)
                     );
                 }
             }
@@ -33,7 +35,7 @@ public class InlineButtons
             if(count % 2 != 0)
             {
                 buttons[1].Add(
-                    InlineKeyboardButton.WithCallbackData(text:$"{count}", callbackData: elements.Last())
+                    InlineKeyboardButton.WithCallbackData(text:$"{count}", callbackData: elements.Last().ItemId)
                 );
             }
         }
@@ -44,17 +46,17 @@ public class InlineButtons
             {
                 buttons[0].Add(
                     InlineKeyboardButton.WithCallbackData(text:$"{elements.IndexOf(item) + 1}",
-                                                callbackData:item)
+                                                callbackData:item.ItemId)
                 );
             }
         }
-        buttons.Add(
-            new List<InlineKeyboardButton>()
-            {
-                InlineKeyboardButton.WithCallbackData(text:"⬅️", callbackData:"prev"),
-                InlineKeyboardButton.WithCallbackData(text:"➡️", callbackData:"next")
-            }
-        );
+        // buttons.Add(
+        //     new List<InlineKeyboardButton>()
+        //     {
+        //         InlineKeyboardButton.WithCallbackData(text:"⬅️", callbackData:"prev"),
+        //         InlineKeyboardButton.WithCallbackData(text:"➡️", callbackData:"next")
+        //     }
+        // );
         return new InlineKeyboardMarkup(buttons);
     }
 }
