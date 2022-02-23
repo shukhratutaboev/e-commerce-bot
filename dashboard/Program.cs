@@ -12,6 +12,15 @@ builder.Services.AddDbContext<DashboardDbContext>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IService<Category>, CategoryService>();
 builder.Services.AddTransient<IService<Item>, ItemService>();
+builder.Services.AddCors(options
+    => options.AddDefaultPolicy(
+        builder => 
+        {
+            builder.AllowAnyOrigin();
+            builder.AllowAnyHeader();
+            builder.AllowAnyMethod();   
+        }
+    ));
 
 var app = builder.Build();
 
