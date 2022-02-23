@@ -11,6 +11,7 @@ public class User
     public double Longitude { get; set; }
     public double Latitude { get; set; }
     public string? Address { get; set; }
+    public string CartJson { get; set; } 
     public Process Process { get; set; }
     
     [Obsolete("Used only for Entity binding.")]
@@ -25,5 +26,6 @@ public class User
         Latitude = 0;
         Address = string.Empty;
         Process = Process.EnteringFullName;
+        CartJson = string.Empty;
     }
 }
