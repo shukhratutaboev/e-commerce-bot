@@ -1,4 +1,4 @@
-using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types.ReplyMarkups;
 
 namespace bot.BotServices.TelegramButtons;
 public class Buttons
@@ -8,7 +8,7 @@ public class Buttons
         {
             new List<KeyboardButton>()
             {
-                new KeyboardButton("Send location"){ RequestLocation = true}
+                new KeyboardButton("📍 Lokatsiya jo'natish"){ RequestLocation = true}
             }
         })
         {
@@ -20,7 +20,7 @@ public class Buttons
         {
             new List<KeyboardButton>()
             {
-                new KeyboardButton("Send contact"){ RequestContact = true}
+                new KeyboardButton("📞 Kontaktni jo'natish"){ RequestContact = true}
             }
         })
         {
@@ -32,13 +32,13 @@ public class Buttons
         {
             new List<KeyboardButton>()
             {
-                new KeyboardButton("Book"){},
-                new KeyboardButton("History"){}
+                new KeyboardButton("🍽 Menyu"){}
+                //new KeyboardButton("Savatcha"){}
             },
             new List<KeyboardButton>()
             {
-                new KeyboardButton("Locations"){},
-                new KeyboardButton("Settings"){}
+                new KeyboardButton("☎️ Kontaktimiz"){},
+                new KeyboardButton("⚙️ Sozlamalar"){}
             }
         })
         {
@@ -73,8 +73,8 @@ public class Buttons
         buttons.Add(
             new List<KeyboardButton>()
             {
-                new KeyboardButton("Cart"),
-                new KeyboardButton("Back to menu")
+                new KeyboardButton("🛒 Savatcha"),
+                new KeyboardButton("↪️ Orqaga")
             }
         );
 

@@ -4,15 +4,34 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace bot.BotServices.TelegramButtons;
 public class InlineButtons
 {
-    public static InlineKeyboardMarkup CartItem(int a, string id)
+    // Savatchaga qo'shilib ishlatiladi
+    public static InlineKeyboardMarkup Cart()
         => new InlineKeyboardMarkup(
             new InlineKeyboardButton[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "➖", $"- {a} {id}"),
-                $"{a}",
-                InlineKeyboardButton.WithCallbackData(text: "➕", $"+ {a} {id}"),
+                InlineKeyboardButton.WithCallbackData(text: "✅ Tasdiqlash", "book"),
+                InlineKeyboardButton.WithCallbackData(text: "❌ Tozalash", "clear")
             }
         );
+
+    // Item'larni miqdorini belgilash uchun, item'ga qo'shilib junatiladi
+    public static InlineKeyboardMarkup CartItem(int a, string id)
+        => new InlineKeyboardMarkup(
+            new List<InlineKeyboardButton[]>() {
+                new InlineKeyboardButton[]
+                {
+                    InlineKeyboardButton.WithCallbackData(text: "➖", $"- {a} {id}"),
+                    $"{a}",
+                    InlineKeyboardButton.WithCallbackData(text: "➕", $"+ {a} {id}"),
+                },
+                new InlineKeyboardButton[]
+                {
+                    InlineKeyboardButton.WithCallbackData(text: "📥 Savatchaga", $"add {a} {id}")
+                }
+            }
+        );
+
+    // Bu buttonlar category'dagi item'larni raqamlab beradi
     public static IReplyMarkup Items(List<Item> elements)
     {
         var buttons = new List<List<InlineKeyboardButton>>(){};
@@ -50,13 +69,6 @@ public class InlineButtons
                 );
             }
         }
-        // buttons.Add(
-        //     new List<InlineKeyboardButton>()
-        //     {
-        //         InlineKeyboardButton.WithCallbackData(text:"⬅️", callbackData:"prev"),
-        //         InlineKeyboardButton.WithCallbackData(text:"➡️", callbackData:"next")
-        //     }
-        // );
         return new InlineKeyboardMarkup(buttons);
     }
 }

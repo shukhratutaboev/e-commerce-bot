@@ -33,6 +33,6 @@ public static class ModelEntityMappers
         var result = memoryStream.ToArray();
         while(result.Count() == 0) result = memoryStream.ToArray();
         var str = Convert.ToBase64String(result);
-        return "data:data:image/jpeg;base64,"+str;
+        return "data:image/jpeg;base64,"+str;
     }
 }

@@ -5,10 +5,10 @@ public class MessageBuilders
 {
     public static string ItemsMessage(List<Item> items)
     {
-        var str = $"Category {items[0].Category.Name}:\n";
+        var str = $"Kategoriya {items[0].Category.Name}:\n\n";
         foreach (var item in items)
         {
-            str += $"{items.IndexOf(item) + 1}. {item.Name} {item.Cost} so'm.\n";
+            str += $"{items.IndexOf(item) + 1}) <b>{item.Name}</b> {item.Cost} so'm.\n";
         }
         return str;
     }

@@ -14,6 +14,7 @@ builder.Services.AddSingleton<TelegramBotClient>(b => new TelegramBotClient(buil
 builder.Services.AddHostedService<Bot>();
 builder.Services.AddTransient<BotHandlers>();
 builder.Services.AddTransient<IStorageService, DbStorageService>();
+builder.Services.AddTransient<CartInternalService>();
 builder.Services.AddHttpClient<DashboardClient>();
 
 var app = builder.Build();  
