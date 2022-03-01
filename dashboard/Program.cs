@@ -1,5 +1,5 @@
 using dashboard.Entities;
-using dashboard.Sevices;
+using dashboard.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

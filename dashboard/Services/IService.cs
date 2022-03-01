@@ -1,4 +1,4 @@
-namespace dashboard.Sevices;
+namespace dashboard.Services;
 public interface IService<T>
 {
     Task<(bool IsSuccess, Exception Exception)> CreateAsync(T newObject);

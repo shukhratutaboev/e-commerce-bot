@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 namespace bot.Entities;
 public class BotDbContext : DbContext
 {
-    public DbSet<User>? Users { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Book> Books { get; set; }
     public BotDbContext(DbContextOptions<BotDbContext> options)
         :base(options) { }
     protected override void OnConfiguring(DbContextOptionsBuilder options)

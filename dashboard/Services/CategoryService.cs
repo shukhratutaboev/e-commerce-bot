@@ -1,7 +1,7 @@
 using dashboard.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace dashboard.Sevices;
+namespace dashboard.Services;
 public class CategoryService : IService<Category>
 {
     private readonly ILogger<CategoryService> _logger;

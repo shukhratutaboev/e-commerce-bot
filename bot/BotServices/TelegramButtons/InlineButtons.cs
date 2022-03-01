@@ -4,6 +4,22 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace bot.BotServices.TelegramButtons;
 public class InlineButtons
 {
+    public static InlineKeyboardMarkup AdminChecking(long? chatId)
+        => new InlineKeyboardMarkup(
+            new InlineKeyboardButton[]
+            {
+                InlineKeyboardButton.WithCallbackData(text: "✅ Tekshirildi", $"checked {chatId}"),
+                InlineKeyboardButton.WithCallbackData(text: "❌ Bekor qilindi", "canceled")
+            }
+        );
+    public static InlineKeyboardMarkup IsRightNumber()
+        => new InlineKeyboardMarkup(
+            new InlineKeyboardButton[]
+            {
+                InlineKeyboardButton.WithCallbackData(text: "✅ Tog'ri", "right"),
+                InlineKeyboardButton.WithCallbackData(text: "✍️ Tahrirlash", "edit")
+            }
+        );
     // Savatchaga qo'shilib ishlatiladi
     public static InlineKeyboardMarkup Cart()
         => new InlineKeyboardMarkup(
@@ -16,20 +32,22 @@ public class InlineButtons
 
     // Item'larni miqdorini belgilash uchun, item'ga qo'shilib junatiladi
     public static InlineKeyboardMarkup CartItem(int a, string id)
-        => new InlineKeyboardMarkup(
-            new List<InlineKeyboardButton[]>() {
-                new InlineKeyboardButton[]
-                {
-                    InlineKeyboardButton.WithCallbackData(text: "➖", $"- {a} {id}"),
-                    $"{a}",
-                    InlineKeyboardButton.WithCallbackData(text: "➕", $"+ {a} {id}"),
-                },
-                new InlineKeyboardButton[]
-                {
-                    InlineKeyboardButton.WithCallbackData(text: "📥 Savatchaga", $"add {a} {id}")
-                }
-            }
-        );
+    {
+        var ar = new List<InlineKeyboardButton>();
+        if(a != 0) ar.Add(InlineKeyboardButton.WithCallbackData(text: "📥 Savatchaga", $"add {a} {id}"));
+        ar.Add(InlineKeyboardButton.WithCallbackData(text: "❌", "delete"));
+        var ik = new InlineKeyboardMarkup(new List<List<InlineKeyboardButton>>()
+        {
+            new List<InlineKeyboardButton>()
+            {
+                InlineKeyboardButton.WithCallbackData(text: "➖", $"- {a} {id}"),
+                $"{a}",
+                InlineKeyboardButton.WithCallbackData(text: "➕", $"+ {a} {id}"),
+            },
+            ar
+        });
+        return ik;
+    }
 
     // Bu buttonlar category'dagi item'larni raqamlab beradi
     public static IReplyMarkup Items(List<Item> elements)

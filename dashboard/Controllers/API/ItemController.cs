@@ -1,5 +1,5 @@
 using dashboard.Entities;
-using dashboard.Sevices;
+using dashboard.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 

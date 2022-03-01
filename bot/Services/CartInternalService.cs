@@ -24,7 +24,8 @@ public class CartInternalService
             var newItem = new Item(itemId, quantity);
             if (cart == default)
             {
-                cart = new UserCart(chatId, newItem);
+                cart = new UserCart(chatId);
+                cart.Cart.Add(newItem);
             }
             else
             {

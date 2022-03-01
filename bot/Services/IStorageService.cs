@@ -8,4 +8,6 @@ public interface IStorageService
     Task<bool> ExistsAsync(long? chatId);
     Task<(User user, bool IsSuccess, Exception exception)> GetUserAsync(long? chatId);
     Task<(List<User> Users, bool IsSuccess, Exception exception)> GetUsersAsync();
+    int GetNumber();
+    Task<Book> CreateBookAsync(long? chatId, long total);
 }

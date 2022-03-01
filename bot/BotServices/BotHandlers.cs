@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using bot.BotServices.TelegramButtons;
+using bot.Entities;
 using bot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -113,7 +114,68 @@ public class BotHandlers
         }
         if(callbackQuery.Data == "book")
         {
-            //to do
+            var user = _storage.GetUserAsync(callbackQuery.Message.Chat.Id).Result.user;
+            if(user.Address == string.Empty)
+            {
+                await client.DeleteMessageAsync(user.ChatId, callbackQuery.Message.MessageId); 
+                await client.SendTextMessageAsync(
+                    user.ChatId,
+                    "Iltimos lokatsiyangizni jo'nating",
+                    replyMarkup: Buttons.SendLocation()
+                );
+                user.Process = Entities.Process.SendingLocation;
+                await _storage.UpdateUserAsync(user);
+            }
+            else await client.EditMessageTextAsync(
+                    callbackQuery.Message.Chat.Id,
+                    callbackQuery.Message.MessageId,
+                    $"Ma'lumotlaringizni tekshirib olganingiz maqul😊\n\nTelefon raqam: {user.PhoneNumber}.\nManzil: {user.Address}.",
+                    ParseMode.Html,
+                    replyMarkup: InlineButtons.IsRightNumber());
+        }
+        if(callbackQuery.Data == "edit")
+        {
+            await client.DeleteMessageAsync(
+                callbackQuery.Message.Chat.Id,
+                callbackQuery.Message.MessageId
+            );
+            await client.SendTextMessageAsync(
+                callbackQuery.Message.Chat.Id,
+                "Iltimos kontaktingizni yoki telefon raqamingizni jo'nating.",
+                replyMarkup: Buttons.SendContact());
+            var user = _storage.GetUserAsync(callbackQuery.Message.Chat.Id).Result.user;
+            user.Process = Entities.Process.SendingContact;
+            await _storage.UpdateUserAsync(user);
+        }
+        if(callbackQuery.Data.Split(" ").ToArray()[0] == "checked")
+        {
+            await client.EditMessageTextAsync(
+                callbackQuery.Message.Chat.Id,
+                callbackQuery.Message.MessageId,
+                callbackQuery.Message.Text + "\n\n✅ Tekshirildi");
+        }
+        if (callbackQuery.Data == "canceled")
+        {
+            await client.EditMessageTextAsync(
+                callbackQuery.Message.Chat.Id,
+                callbackQuery.Message.MessageId,
+                callbackQuery.Message.Text + "\n\n❌ Bekor qilindi");
+        }
+        if(callbackQuery.Data == "delete")
+        {
+            await client.DeleteMessageAsync(callbackQuery.Message.Chat.Id, callbackQuery.Message.MessageId);
+        }
+        if (callbackQuery.Data == "right")
+        {
+            await client.SendTextMessageAsync(
+                callbackQuery.Message.Chat.Id,
+                "Buyurtmangiz qabul qilindi",
+                replyMarkup: Buttons.Menu());
+            await client.DeleteMessageAsync(
+                callbackQuery.Message.Chat.Id,
+                callbackQuery.Message.MessageId);
+            await SendToAdmin(client, _cartService.GetUserCart(callbackQuery.Message.Chat.Id));
+            _cartService.ClearCart(callbackQuery.Message.Chat.Id);
         }
         if(callbackQuery.Data.Split(" ").ToArray()[0] == "+")
         {
@@ -195,14 +257,68 @@ public class BotHandlers
                             return;
                         }
                     }
-                    else user.PhoneNumber = "+"+message.Contact.PhoneNumber;
+                    else user.PhoneNumber = message.Contact.PhoneNumber;
                     user.Process = Entities.Process.None;
                     await _storage.UpdateUserAsync(user);
+                    if (_cartService.GetUserCart(message.Chat.Id) is null || _cartService.GetUserCart(message.Chat.Id).Cart.Count == 0)
                     await client.SendTextMessageAsync(
                         user.ChatId,
                         "Botdan foydalanishingiz mumkin 😊",
                         replyMarkup: Buttons.Menu()
                     );
+                    else
+                    {
+                        await client.SendTextMessageAsync(
+                            user.ChatId,
+                            "Endi lokatsiyangizni jo'nating",
+                            replyMarkup: Buttons.SendLocation()
+                        );
+                        user.Process = Entities.Process.SendingLocation;
+                        await _storage.UpdateUserAsync(user);
+                    }
+                }
+                else if(user.Process == Entities.Process.SendingLocation)
+                {
+                    if(message.Location is null)
+                    {
+                        await client.SendTextMessageAsync(
+                            user.ChatId,
+                            "Iltimos lokatsiyangizni jo'nating"
+                        );
+                    }
+                    else
+                    {
+                        user.Longitude = message.Location.Longitude;
+                        user.Latitude = message.Location.Latitude;
+                        user.Process = Entities.Process.EnteringAddress;
+                        await _storage.UpdateUserAsync(user);
+                        await client.SendTextMessageAsync(
+                            user.ChatId,
+                            "Iltimos lokatsiyaga qo'shimcha ravishda manzilingizni kiritsangiz. Masalan mahalla, uy va kvartira raqami."
+                        );
+                    }
+                }
+                else if(user.Process == Entities.Process.EnteringAddress)
+                {
+                    if(message.Text is null)
+                    {
+                        await client.SendTextMessageAsync(
+                            user.ChatId,
+                            "Iltimos manzilni tekst ko'rinishida jo'nating"
+                        );
+                    }
+                    else
+                    {
+                        user.Address = message.Text;
+                        await _storage.UpdateUserAsync(user);
+                        await client.SendTextMessageAsync(
+                            user.ChatId,
+                            $"Ma'lumotlaringizni tekshirib olganingiz maqul😊\n\nTelefon raqam: {user.PhoneNumber}.\nManzil: {user.Address}.",
+                            ParseMode.Html,
+                            replyMarkup: InlineButtons.IsRightNumber());
+                        user.Process = Entities.Process.None;
+                        await _storage.UpdateUserAsync(user);
+                    }
                 }
             }
             else
@@ -219,7 +335,7 @@ public class BotHandlers
                 {
                     var cart = _cartService.GetUserCart(message.Chat.Id);
                     var text = "";
-                    if (cart.Cart.Count == 0) text = "Savatcha bo'sh";
+                    if (cart is null || cart.Cart.Count == 0) text = "Savatcha bo'sh";
                     else
                     {
                         long sum = 0;
@@ -236,10 +352,19 @@ public class BotHandlers
                         user.ChatId,
                         text,
                         ParseMode.Html,
-                        replyMarkup: cart.Cart.Count == 0 ? null : InlineButtons.Cart()
+                        replyMarkup: cart is null || cart.Cart.Count == 0 ? null : InlineButtons.Cart()
                     );
+                    cart = cart is null ? new UserCart(message.Chat.Id) : cart;
                     cart.MessageId = m.MessageId;
                     _cartService.UpdateCart(cart);
+                }
+                if(message.Text == "↪️ Orqaga")
+                {
+                    await client.SendTextMessageAsync(
+                        user.ChatId,
+                        "Asosiy panel",
+                        replyMarkup: Buttons.Menu()
+                    );
                 }
                 if(_client.GetCategoriesAsync().Result.categories.Select(c => c.Name).ToList().Contains(message.Text))
                 {
@@ -253,5 +378,21 @@ public class BotHandlers
                 }
             }
         }
+    }
+    public async Task SendToAdmin(ITelegramBotClient client, UserCart cart)
+    {
+        var admin = 426131983;
+        var user = _storage.GetUserAsync(cart.UserId).Result.user;
+        var text = $"Yangi buyurtma:\n\nFoydalanuvchi: {user.Fullname}\nTelefon raqam: {user.PhoneNumber}\nManzil: {user.Address}\nBuyurtma:";
+        foreach(var i in cart.Cart)
+        {
+            var item = _client.GetItemAsync(i.ItemId).Result.item;
+            text += $"\n    {cart.Cart.IndexOf(i) + 1}) {item.Name} - {i.Quantity} ta";
+        }
+        var m =await client.SendTextMessageAsync(
+            admin,
+            text,
+            replyMarkup: InlineButtons.AdminChecking(user.ChatId));
+        await client.SendLocationAsync(admin,user.Latitude, user.Longitude,replyToMessageId: m.MessageId);
     }
 }

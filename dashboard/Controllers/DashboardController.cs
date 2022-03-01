@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using dashboard.Models;
-using dashboard.Sevices;
+using dashboard.Services;
 using dashboard.Entities;
 using dashboard.Mappers;
 

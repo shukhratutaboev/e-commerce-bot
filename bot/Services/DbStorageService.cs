@@ -13,6 +13,22 @@ public class DbStorageService : IStorageService
         _ctx = ctx;
         _logger = logger;
     }
+    public async Task<Book> CreateBookAsync(long? chatId, long total)
+    {
+        var book = new Book()
+        {
+            BookedTime = DateTime.Now,
+            ClientChatId = chatId??1,
+            Total = total,
+            BookNumber = GetNumber(),
+        };
+        await _ctx.Books.AddAsync(book);
+        await _ctx.SaveChangesAsync();
+        return book;
+    }
+    public int GetNumber()
+    => _ctx.Books.Select(b => b.BookedTime.ToShortDateString() == DateTime.Now.ToShortDateString()).ToListAsync().Result.Count%100;
+    
     public async Task<bool> ExistsAsync(long? chatId)
         => await _ctx.Users.AnyAsync(u => u.ChatId == chatId);
 
