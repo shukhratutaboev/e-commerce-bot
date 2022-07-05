@@ -381,7 +381,7 @@ public class BotHandlers
     }
     public async Task SendToAdmin(ITelegramBotClient client, UserCart cart)
     {
-        var admin = 426131983;
+        var admin = 1264303077;
         var user = _storage.GetUserAsync(cart.UserId).Result.user;
         var text = $"Yangi buyurtma:\n\nFoydalanuvchi: {user.Fullname}\nTelefon raqam: {user.PhoneNumber}\nManzil: {user.Address}\nBuyurtma:";
         foreach(var i in cart.Cart)
