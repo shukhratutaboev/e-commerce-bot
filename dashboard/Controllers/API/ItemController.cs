@@ -42,6 +42,6 @@ public class ItemController : ControllerBase
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }
         );
-        return Ok(json);
+        return Ok($"Done{json}");
     }
 }
